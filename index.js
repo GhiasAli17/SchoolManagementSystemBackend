@@ -1,7 +1,8 @@
 const express = require("express")
 const app = express()
 require("dotenv").config()
-const stripe = require("stripe")("sk_test_51LCeVVH2g5fObnyUIdJeaiNckcvlVFFIfVbwu2qxnWotdea9u6FWEzxsE83rlIqzX1yx4VcIJBrq5nArRdlLUQBc00SqqEClM1")
+const Stripe = require("stripe")
+const stripe = Stripe("sk_test_51LCeVVH2g5fObnyUIdJeaiNckcvlVFFIfVbwu2qxnWotdea9u6FWEzxsE83rlIqzX1yx4VcIJBrq5nArRdlLUQBc00SqqEClM1")
 const bodyParser = require("body-parser")
 const cors = require("cors")
 
@@ -11,12 +12,13 @@ app.use(bodyParser.json())
 app.use(cors())
 
 app.post("/payment", cors(), async (req, res) => {
-	let { amount, id } = req.body
+	let { amount, id,description } = req.body
+	console.log('amount in backedn', amount)
 	try {
 		const payment = await stripe.paymentIntents.create({
-			amount,
+			amount:amount*100,
 			currency: "USD",
-			description: "Item1",
+			description: description,
 			payment_method: id,
 			confirm: true
 		})
@@ -26,7 +28,7 @@ app.post("/payment", cors(), async (req, res) => {
 			success: true
 		})
 	} catch (error) {
-		console.log("Error", error)
+		console.log("Error IN backedn", error)
 		res.json({
 			message: "Payment failed",
 			success: false
